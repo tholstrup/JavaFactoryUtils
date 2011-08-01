@@ -5,53 +5,52 @@ import java.lang.reflect.InvocationHandler;
 /**
  * The base factory from which other abstract factories are derived.
  */
-public abstract class BaseFactory {
+public abstract class BaseFactory<T>
+{
+    private boolean createNewInstanceEachTime;
+    private Class<? extends T> instanceClass;
 
-	private Class instanceClass;
-	private boolean createNewInstanceEachTime = getDefaultCreateNewInstanceEachTime();
+    protected boolean defaultCreateNewInstanceEachTime;
+    protected Class<? extends T> defaultImplementationClass;
 
-	/**
-	 * @return True if a new instance should be created each time, false if versions should be cached.
-	 */
-	protected abstract boolean getDefaultCreateNewInstanceEachTime();
+    /**
+     * @return An array of {@link InvocationHandler}s which have a constructor that takes a single object. It is also expected that the
+     *         invocation handler will call through to the underlying proxied class (cannot be null).
+     */
+    protected abstract Class[] getInvocationHandlers ();
 
-	/**
-	 * @return The default implementation Class that this factory should return.
-	 */
-	protected abstract Class getDefaultImplementationClass();
+    protected final Class<? extends T> getInstanceClass ()
+    {
+        if (instanceClass == null)
+        {
+            instanceClass = defaultImplementationClass;
+        }
+        return instanceClass;
+    }
 
-	/**
-	 * @return An array of {@link InvocationHandler}s which have a constructor that takes a single object. It is also expected that the invocation
-	 *         handler will call through to the underlying proxied class (cannot be null).
-	 */
-	protected abstract Class[] getInvocationHandlers();
+    /**
+     * Allows you to override the default implementing class should the need arise.
+     * 
+     * @param instanceClass
+     */
+    public final void overrideInstanceClass (Class<? extends T> instanceClass)
+    {
+        this.instanceClass = instanceClass;
+    }
 
-	protected final Class getInstanceClass() {
-		if (instanceClass == null) {
-			instanceClass = getDefaultImplementationClass();
-		}
-		return instanceClass;
-	}
+    protected final boolean isCreateNewInstanceEachTime ()
+    {
+        return createNewInstanceEachTime;
+    }
 
-	/**
-	 * Allows you to override the default implementing class should the need arise.
-	 * 
-	 * @param instanceClass
-	 */
-	public final void overrideInstanceClass(Class instanceClass) {
-		this.instanceClass = instanceClass;
-	}
+    protected final void setCreateNewInstanceEachTime (boolean createNewInstanceEachTime)
+    {
+        this.createNewInstanceEachTime = createNewInstanceEachTime;
+    }
 
-	protected final boolean isCreateNewInstanceEachTime() {
-		return createNewInstanceEachTime;
-	}
-
-	protected final void setCreateNewInstanceEachTime(boolean createNewInstanceEachTime) {
-		this.createNewInstanceEachTime = createNewInstanceEachTime;
-	}
-
-	protected void resetFactoryDefaults() {
-		instanceClass = getDefaultImplementationClass();
-		createNewInstanceEachTime = getDefaultCreateNewInstanceEachTime();
-	}
+    protected void resetFactoryDefaults ()
+    {
+        instanceClass = defaultImplementationClass;
+        createNewInstanceEachTime = defaultCreateNewInstanceEachTime;
+    }
 }

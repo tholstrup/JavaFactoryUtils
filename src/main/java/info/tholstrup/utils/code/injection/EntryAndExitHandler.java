@@ -28,6 +28,7 @@ public class EntryAndExitHandler extends FactoryInvocationHandler
         logger = LoggerFactory.getLogger(getWrappedClass());
     }
 
+    @Override
     public Object invoke (Object proxy, Method method, Object[] args) throws Throwable
     {
         Object result = null;
